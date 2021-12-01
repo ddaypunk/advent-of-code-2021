@@ -1,33 +1,66 @@
 package day1
 
 fun main() {
-    val dataArray = InputData.data
-    println(dataArray)
-    val previousWindow:Array<Int> = arrayOf(dataArray[0].toInt(), dataArray[1].toInt(), dataArray[2].toInt())
-    var previousTotal = previousWindow.reduce { acc, each -> acc + each }
-    println("${previousWindow.contentToString()} = $previousTotal (N/A - no previous sum)")
-    var increasedCounter = 0
+    val sonar = Sonar(InputData.data)
+    sonar.print()
+    sonar.calculateIncreases()
+}
 
-    for(i in 1..dataArray.size-3) {
-        val currentWindow:Array<Int> = arrayOf(dataArray[i].toInt(), dataArray[i+1].toInt(), dataArray[i+2].toInt())
-        val currentTotal = currentWindow.reduce { acc, each -> acc + each }
-        print("${currentWindow.contentToString()} = $currentTotal ")
+class Sonar(private val data: List<String>) {
+    var counter = 0
 
-        when {
-            currentTotal > previousTotal -> {
-                increasedCounter++
-                print("(increased)\n")
-            }
-            currentTotal == previousTotal -> {
-                print("(no change)\n")
-            }
-            currentTotal < previousTotal -> {
-                print("(decreased)\n")
-            }
+    fun calculateIncreases() {
+        val windows = generateWindows()
+        var previousWindow = windows[0] // initialize with the first data window
+
+        printComparison(null, previousWindow)
+
+        for(i in 1 until windows.size) {
+            val currentWindow = windows[i]
+            printComparison(currentWindow, previousWindow)
+
+            previousWindow = currentWindow
         }
 
-        previousTotal = currentTotal
+        println("\nTotal increases: $counter")
     }
 
-    println(increasedCounter)
+    private fun printComparison(currentWindow: Window?, previousWindow: Window) {
+
+        when {
+            currentWindow == null -> {
+                print("${previousWindow.printable} = ${previousWindow.total} (N/A - no previous sum)\n")
+            }
+            currentWindow.total > previousWindow.total -> {
+                counter++
+                print("${currentWindow.printable} = ${currentWindow.total} (increased)\n")
+            }
+            currentWindow.total == previousWindow.total -> {
+                print("${currentWindow.printable} = ${currentWindow.total} (no change)\n")
+            }
+            currentWindow.total < previousWindow.total -> {
+                print("${currentWindow.printable} = ${currentWindow.total} (decreased)\n")
+            }
+        }
+    }
+
+    private fun generateWindows(): List<Window> {
+        val windows: ArrayList<Window> = arrayListOf()
+
+        for(i in 0..data.size-3) {
+            windows.add(
+                Window(arrayOf(data[i].toInt(), data[i+1].toInt(), data[i+2].toInt()))
+            )
+        }
+
+        return windows
+    }
+
+    fun print() = println(data)
+
+}
+
+class Window(depths: Array<Int>) {
+    val total: Int = depths.reduce { acc, each -> acc + each }
+    val printable: String = depths.contentToString()
 }
