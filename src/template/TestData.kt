@@ -1,7 +1,9 @@
 package template
 
 class TestData {
-    val data = """
+    companion object {
+        val data = """
         
-    """.trimIndent().lines()
+""".trimIndent().lines()
+    }
 }
